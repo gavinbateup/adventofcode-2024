@@ -1,4 +1,6 @@
-﻿var input = File.ReadAllText("./Input.txt");
+﻿using System.Runtime.CompilerServices;
+
+var input = File.ReadAllText("./Input.txt");
 
 //input = @"7 6 4 2 1
 //1 2 7 8 9
@@ -54,60 +56,69 @@ foreach (var line in lines)
 
 Console.WriteLine($"Day 2 Part 1 : {safeReportCount}");
 
-safeReportCount = 0;
+var isSafe = (int[] values) => {
 
-foreach (var line in lines)
-{
-    var values = line.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(x => int.Parse(x)).ToArray();
     var safe = true;
     var increasing = false;
-    var lastValue = 0;
-    var errorRemoved = false;
-
     for (int i = 0; i < values.Length; i++)
     {
 
         if (i > 0)
         {
-            var diff = Math.Abs(values[i] -lastValue);
+            var diff = Math.Abs(values[i] - values[i - 1]);
             if (diff > 3 || diff < 1)
             {
-                if (errorRemoved)
-                    safe = false;
-
-                errorRemoved = true;
+                safe = false;
                 continue;
             }
 
             if (i == 1)
             {
-                increasing = values[i] > lastValue;
+                increasing = values[i] > values[i - 1];
             }
             else
             {
-                if (increasing && values[i] < lastValue)
+                if (increasing && values[i] < values[i - 1])
                 {
-                    if (errorRemoved)
-                        safe = false;
-
-                    errorRemoved = true;
+                    safe = false;
                     continue;
                 }
-                if (!increasing && values[i] > lastValue)
+                if (!increasing && values[i] > values[i - 1])
                 {
-                    if (errorRemoved)
-                        safe = false;
-
-                    errorRemoved = true;
+                    safe = false;
                     continue;
                 }
             }
         }
-        lastValue = values[i];
     }
+    return safe;
+};
 
-    if (safe)
+
+safeReportCount = 0;
+
+foreach (var line in lines)
+{
+    var values = line.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(x => int.Parse(x)).ToArray();
+
+
+    if (isSafe(values))
+    {
         safeReportCount++;
+    }
+    else
+    {
+         for (int i = 0; i < values.Length; i++)
+        {
+            var newlist = values.Take(i).ToArray().Concat(values.Skip(i+1).ToArray()).ToArray();
+            if (isSafe(newlist))
+            {
+                safeReportCount++;
+                break;
+            }
+        }
+    }
 }
 
 Console.WriteLine($"Day 2 Part 2 : {safeReportCount}");
+
