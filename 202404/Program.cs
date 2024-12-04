@@ -1,6 +1,4 @@
-﻿using _202404;
-
-var input = File.ReadAllText("./Input.txt");
+﻿var input = File.ReadAllText("./Input.txt");
 
 //input = @"MMMSXXMASM
 //MSAMXMSMSA
@@ -23,17 +21,10 @@ for (int y = 0; y < lines.Length; y++)
         var ch = lines[y][x];
         if (ch == 'X')
         {
-
-            xmasCount += IsXmas(x, y, lines, direction.East) ? 1 : 0;
-            xmasCount += IsXmas(x, y, lines, direction.West) ? 1 : 0;
-            xmasCount += IsXmas(x, y, lines, direction.North) ? 1 : 0;
-            xmasCount += IsXmas(x, y, lines, direction.South) ? 1 : 0;
-            xmasCount += IsXmas(x, y, lines, direction.NorthEast) ? 1 : 0;
-            xmasCount += IsXmas(x, y, lines, direction.NorthWest) ? 1 : 0;
-            xmasCount += IsXmas(x, y, lines, direction.SouthEast) ? 1 : 0;
-            xmasCount += IsXmas(x, y, lines, direction.SouthWest) ? 1 : 0;
-
-
+            for(int dir = 0; dir < 8; dir++)
+            {
+                xmasCount += IsXmas(x, y, lines, (Direction)dir) ? 1 : 0;
+            }
         }
     }
 }
@@ -51,15 +42,15 @@ for (int y = 0; y < lines.Length; y++)
         {
             var mas1 = false; var mas2 = false;
             // north east and southWest
-            var ne = GetCharInDirection(direction.NorthEast, x, y, lines);
-            var sw = GetCharInDirection(direction.SouthWest, x, y, lines);
+            var ne = GetCharInDirection(Direction.NorthEast, x, y, lines);
+            var sw = GetCharInDirection(Direction.SouthWest, x, y, lines);
 
             if ((ne == 'M' && sw == 'S') || (ne == 'S' && sw == 'M'))
             {
                 mas1 = true;
             }
-            var nw = GetCharInDirection(direction.NorthWest, x, y, lines);
-            var se = GetCharInDirection(direction.SouthEast, x, y, lines);
+            var nw = GetCharInDirection(Direction.NorthWest, x, y, lines);
+            var se = GetCharInDirection(Direction.SouthEast, x, y, lines);
 
             if ((nw == 'M' && se == 'S') || (nw == 'S' && se == 'M'))
             {
@@ -87,7 +78,7 @@ char NextChar(char ch)
     }
     throw new NotImplementedException();
 }
-bool IsXmas(int x, int y, string[] lines, direction direction)
+bool IsXmas(int x, int y, string[] lines, Direction direction)
 {
     var currentChar = 'X';
     var valid = true;
@@ -101,35 +92,48 @@ bool IsXmas(int x, int y, string[] lines, direction direction)
     return true;
 }
 
-char GetCharInDirection(direction direction, int x, int y, string[] lines)
+char GetCharInDirection(Direction direction, int x, int y, string[] lines)
 {
     var valid = true;
     (y, x, valid) = NextPos(x, y, direction, lines.Length, lines[0].Length);
     return valid ? lines[y][x] : '.';    
 }
 
-(int x, int y, bool valid) NextPos(int x, int y, direction direction, int maxY, int maxX)
+(int x, int y, bool valid) NextPos(int x, int y, Direction direction, int maxY, int maxX)
 {
     switch (direction)
     {
-        case direction.North:
+        case Direction.North:
             return (y - 1, x, y > 0);
-        case direction.South:
+        case Direction.South:
             return (y + 1, x, y < maxY-1);
-        case direction.East:
+        case Direction.East:
             return (y, x + 1, x < maxX-1);
-        case direction.West:
+        case Direction.West:
             return (y, x - 1, x > 0);
 
-        case direction.NorthEast:
+        case Direction.NorthEast:
             return (y - 1, x + 1, y > 0 && x < maxX-1);
-        case direction.SouthEast:
+        case Direction.SouthEast:
             return (y + 1, x + 1, y < maxY-1 && x < maxX-1);
 
-        case direction.NorthWest:
+        case Direction.NorthWest:
             return (y - 1, x - 1, y > 0 && x > 0);
-        case direction.SouthWest:
+        case Direction.SouthWest:
             return (y + 1, x - 1, y < maxY-1 && x > 0);
     }
     return (x, y, false);
+}
+
+public enum Direction
+{
+    North = 0,
+    NorthEast = 1,
+    East = 2,
+    SouthEast = 3,
+    South = 4,
+    SouthWest = 5,
+    West = 6,
+    NorthWest = 7
+
 }
