@@ -47,24 +47,32 @@ for (int y = 0; y < lines.Length; y++)
     for (int x = 0; x < lines[y].Length; x++)
     {
         var ch = lines[y][x];
-        if (ch == 'X')
+        if (ch == 'A')
         {
+            var mas1 = false; var mas2 = false;
+            // north east and southWest
+            var ne = GetCharInDirection(direction.NorthEast, x, y, lines);
+            var sw = GetCharInDirection(direction.SouthWest, x, y, lines);
 
-            xmasCount += IsXmas(x, y, lines, direction.East) ? 1 : 0;
-            xmasCount += IsXmas(x, y, lines, direction.West) ? 1 : 0;
-            xmasCount += IsXmas(x, y, lines, direction.North) ? 1 : 0;
-            xmasCount += IsXmas(x, y, lines, direction.South) ? 1 : 0;
-            xmasCount += IsXmas(x, y, lines, direction.NorthEast) ? 1 : 0;
-            xmasCount += IsXmas(x, y, lines, direction.NorthWest) ? 1 : 0;
-            xmasCount += IsXmas(x, y, lines, direction.SouthEast) ? 1 : 0;
-            xmasCount += IsXmas(x, y, lines, direction.SouthWest) ? 1 : 0;
+            if ((ne == 'M' && sw == 'S') || (ne == 'S' && sw == 'M'))
+            {
+                mas1 = true;
+            }
+            var nw = GetCharInDirection(direction.NorthWest, x, y, lines);
+            var se = GetCharInDirection(direction.SouthEast, x, y, lines);
 
+            if ((nw == 'M' && se == 'S') || (nw == 'S' && se == 'M'))
+            {
+                mas2 = true;
+            }
+
+            masXCount += mas1 && mas2 ? 1 : 0;
 
         }
     }
 }
 
-Console.WriteLine($"Day 4 Part 1: {xmasCount}");
+Console.WriteLine($"Day 4 Part 2: {masXCount}");
 
 char NextChar(char ch)
 {
@@ -93,7 +101,12 @@ bool IsXmas(int x, int y, string[] lines, direction direction)
     return true;
 }
 
-
+char GetCharInDirection(direction direction, int x, int y, string[] lines)
+{
+    var valid = true;
+    (y, x, valid) = NextPos(x, y, direction, lines.Length, lines[0].Length);
+    return valid ? lines[y][x] : '.';    
+}
 
 (int x, int y, bool valid) NextPos(int x, int y, direction direction, int maxY, int maxX)
 {
