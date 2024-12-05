@@ -34,6 +34,8 @@ var lines = input.Split('\n').Select(s => s.Trim()).ToArray();
 var rules = new List<int[]>();
 var pageLists = new List<int[]>();
 
+var corrected = new List<int[]>();
+
 var currentList = rules;
 var separator = '|';
 foreach (var line in lines)
@@ -52,6 +54,8 @@ Console.WriteLine($"Rules count:{rules.Count}");
 Console.WriteLine($"pagelists count:{pageLists.Count}");
 
 int outputSum = 0;
+int correctedSum = 0;
+
 foreach (var pagelist in pageLists)
 {
     var valid = true;
@@ -82,12 +86,50 @@ foreach (var pagelist in pageLists)
 
     if (valid)
     {
-        Console.WriteLine(string.Join(',', pagelist));
+        //Console.WriteLine(string.Join(',', pagelist));
         var middle = (int)Math.Floor((double)pagelist.Length / 2);
-        Console.WriteLine($"middle value: {pagelist[middle]}");
+        //Console.WriteLine($"middle value: {pagelist[middle]}");
         outputSum += pagelist[middle];
+    }
+    else
+    {
+        // part 2
+        for (int i = 0; i < pagelist.Length; i++)
+        {
+            var applicableRules = rules.Where(r => r[1] == pagelist[i]).ToArray();
+            if (applicableRules.Length > 0)
+            {
+                var reset = false;
+                foreach (var rule in applicableRules)
+                {
+                    for (int r = i; r < pagelist.Length; r++)
+                    {
+                        if (rule[0] == pagelist[r])
+                        {
+                            var t = pagelist[r];
+                            pagelist[r] = pagelist[i];
+                            pagelist[i] = t;
+                            reset = true;
+                            i = -1;
+                            break;
+                        }
+                    }
+                    if (reset == true)
+                        break;
+                    
+                }
+                
+            }
+        }
+        Console.WriteLine("Corrected: " + string.Join(',', pagelist));
+        var middle = (int)Math.Floor((double)pagelist.Length / 2);
+        Console.WriteLine($"Corrected middle value: {pagelist[middle]}\n");
+        
+        correctedSum += pagelist[middle];
+
     }
 
 }
 
 Console.WriteLine($"Day 5 Part 1: {outputSum}");
+Console.WriteLine($"Day 5 Part 2: {correctedSum}");
